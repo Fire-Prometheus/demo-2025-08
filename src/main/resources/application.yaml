@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: demo
+demo:
+  paging:
+    page-size: 50
