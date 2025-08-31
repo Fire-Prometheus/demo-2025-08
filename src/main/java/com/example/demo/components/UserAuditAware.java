@@ -1,6 +1,7 @@
 package com.example.demo.components;
 
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
@@ -9,7 +10,9 @@ public class UserAuditAware implements AuditorAware<String> {
 
     @Override
     public Optional<String> getCurrentAuditor() {
-//        return Optional.of().or("SYSTEM");
-        return Optional.of(SYSTEM_USER);
+        var authentication = SecurityContextHolder.getContext()
+                                                  .getAuthentication();
+        var credentials = ((String) authentication.getCredentials());
+        return Optional.of(credentials == null ? SYSTEM_USER : credentials);
     }
 }

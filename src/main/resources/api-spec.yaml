@@ -1,0 +1,114 @@
+openapi: 3.0.2
+info:
+  title: Transaction REST API
+  version: 1.0.0
+servers:
+  - url: /api/v1
+tags:
+  - name: Transaction
+    description: Transaction API
+paths:
+  /transaction/{iban}:
+    get:
+      tags:
+        - Transaction
+      summary: Search transactions
+      description: Find all transactions by IBAN with paging
+      operationId: findTransactionsByIbanAndYearAndMonthAndEquivalentCurrency
+      parameters:
+        - name: iban
+          in: path
+          description: IBAN of the client
+          required: true
+          schema:
+            type: string
+        - name: year-month
+          in: query
+          description: for limit result for the specific month and year, just need to specify the first date of the month
+          required: true
+          schema:
+            type: string
+            format: date
+            example: 2025-01-01
+        - name: equivalentCurrency
+          in: query
+          description: equivalent ISO currency
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: page number starting from 1
+          required: true
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: page size starting from 1
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionSummary'
+        '400':
+          description: Invalid status value
+components:
+  schemas:
+    Transaction:
+      type: object
+      required:
+        - uuid
+        - currency
+        - amount
+        - equivalentCurrency
+        - equivalentAmount
+        - valueDate
+      properties:
+        uuid:
+          type: string
+          example: 89d3o179-abcd-465b-o9ee-e2d5f6ofEld46
+        currency:
+          type: string
+          example: GBP
+        amount:
+          type: number
+          format: double
+          example: 100
+        equivalentCurrency:
+          type: string
+          example: CHF
+        equivalentAmount:
+          type: number
+          format: double
+          example: 108.27
+        valueDate:
+          type: string
+          format: date
+          example: 2020-01-01
+        description:
+          type: string
+          example: Online payment CHF
+
+    TransactionSummary:
+      type: object
+      required:
+        - page
+        - pageSize
+        - transactions
+      properties:
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 10
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+

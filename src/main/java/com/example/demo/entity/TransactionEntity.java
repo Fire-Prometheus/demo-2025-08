@@ -18,6 +18,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Table(name = "TRANSACTION")
 public class TransactionEntity {
     @Id
     @Column(name = "uuid", nullable = false)
@@ -38,11 +39,11 @@ public class TransactionEntity {
     private Instant lastModifiedDate;
 
     @CreatedBy
-    @Column(name = "created_by")
+    @Column(name = "created_by", length = 20)
     private String createdBy;
 
     @LastModifiedBy
-    @Column(name = "last_modified_by")
+    @Column(name = "last_modified_by", length = 20)
     private String lastModifiedBy;
 
     @Column(name = "currency", nullable = false, length = 3)
@@ -51,7 +52,7 @@ public class TransactionEntity {
     @Column(name = "amount", nullable = false, precision = 19, scale = 6)
     private BigDecimal amount;
 
-    @Column(name = "iban", nullable = false)
+    @Column(name = "iban", nullable = false, length = 34)
     private String iban;
 
     @Column(name = "value_date", nullable = false)
