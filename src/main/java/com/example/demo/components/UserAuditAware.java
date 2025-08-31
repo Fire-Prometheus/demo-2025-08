@@ -1,5 +1,6 @@
 package com.example.demo.components;
 
+import com.sun.security.auth.UserPrincipal;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -12,7 +13,7 @@ public class UserAuditAware implements AuditorAware<String> {
     public Optional<String> getCurrentAuditor() {
         var authentication = SecurityContextHolder.getContext()
                                                   .getAuthentication();
-        var credentials = ((String) authentication.getCredentials());
-        return Optional.of(credentials == null ? SYSTEM_USER : credentials);
+        var userId = ((UserPrincipal) authentication.getPrincipal()).getName();
+        return Optional.of(userId == null ? SYSTEM_USER : userId);
     }
 }

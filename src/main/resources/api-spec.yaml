@@ -8,20 +8,14 @@ tags:
   - name: Transaction
     description: Transaction API
 paths:
-  /transaction/{iban}:
+  /transaction:
     get:
       tags:
         - Transaction
       summary: Search transactions
-      description: Find all transactions by IBAN with paging
-      operationId: findTransactionsByIbanAndYearAndMonthAndEquivalentCurrency
+      description: Find all transactions by user with paging
+      operationId: findTransactionsByUserAndYearAndMonthAndEquivalentCurrency
       parameters:
-        - name: iban
-          in: path
-          description: IBAN of the client
-          required: true
-          schema:
-            type: string
         - name: year-month
           in: query
           description: for limit result for the specific month and year, just need to specify the first date of the month
@@ -57,6 +51,10 @@ paths:
                 $ref: '#/components/schemas/TransactionSummary'
         '400':
           description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Transaction:
@@ -111,4 +109,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Transaction'
-
+    Error:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+          example: Invalid input

@@ -71,3 +71,58 @@ databaseChangeLog:
             columns:
               - column:
                   name: iban
+
+  - changeSet:
+      id: Create Account Table
+      author: Alex TO
+      changes:
+        - createTable:
+            tableName: ACCOUNT
+            columns:
+              - column:
+                  name: iban
+                  type: VARCHAR(34)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified_date
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: Create Index on the table Account
+      author: Alex TO
+      changes:
+        - createIndex:
+            indexName: IDX_TX_USER
+            tableName: ACCOUNT
+            columns:
+              - column:
+                  name: user_id
