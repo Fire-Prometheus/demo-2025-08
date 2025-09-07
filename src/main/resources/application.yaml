@@ -2,7 +2,7 @@ spring:
   application:
     name: demo
   datasource:
-    url: jdbc:tc:mysql:latest:///test
-    username: test
-    password: test
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:tc:postgres:latest:///test
+#    username: test
+#    password: test
+    driver-class-name: org.postgresql.Driver

@@ -1,13 +1,12 @@
 services:
-  mysql:
-    image: 'mysql:latest'
+  postgres:
+    image: 'postgres:latest'
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      POSTGRES_DB: 'testdb'
+      POSTGRES_USER: 'testuser'
+      POSTGRES_PASSWORD: 'testpassword'
     ports:
-      - '3306'
+      - '5432'
   zipkin:
     image: 'openzipkin/zipkin:latest'
     ports:
