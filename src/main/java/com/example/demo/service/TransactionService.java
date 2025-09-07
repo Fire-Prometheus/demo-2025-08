@@ -6,13 +6,15 @@ import com.example.demo.domain.mapper.TransactionMapper;
 import com.example.demo.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
+import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.example.demo.kafka.TransactionTableProcessor.TABLE_NAME;
 
 @Service
 @RequiredArgsConstructor
@@ -20,12 +22,13 @@ import java.util.List;
 public class TransactionService {
     private final TransactionRepository repository;
     private final TransactionMapper transactionMapper;
-    private final KafkaStreams streams;
+    private final StreamsBuilderFactoryBean streamsBuilderFactoryBean;
 
 
     //    @Cacheable(cacheNames = "monthly-transactions", keyGenerator = "#iban+'|'+#year+'-'#month")
     public MonthlyTransactions getTransactionsByIbanAndYearAndMonth(String iban, int year, int month) {
-        ReadOnlyKeyValueStore<String, MonthlyTransactions> store = streams.store(StoreQueryParameters.fromNameAndType("transactions-by-iban-month", QueryableStoreTypes.keyValueStore()));
+        var streams = streamsBuilderFactoryBean.getKafkaStreams();
+        ReadOnlyKeyValueStore<String, MonthlyTransactions> store = streams.store(StoreQueryParameters.fromNameAndType(TABLE_NAME, QueryableStoreTypes.keyValueStore()));
         String compositeKey = iban + "|" + month + "-" + year;
         var monthlyTransactions = store.get(compositeKey);
         var size = monthlyTransactions.getTransactions()
