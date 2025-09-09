@@ -1,78 +1,5 @@
 databaseChangeLog:
   - changeSet:
-      id: Create Transaction Table
-      author: Alex TO
-      changes:
-        - createTable:
-            tableName: TRANSACTION
-            columns:
-              - column:
-                  name: uuid
-                  type: UUID
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: version
-                  type: INT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: created_date
-                  type: DATETIME
-                  constraints:
-                    nullable: false
-              - column:
-                  name: last_modified_date
-                  type: DATETIME
-                  constraints:
-                    nullable: false
-              - column:
-                  name: created_by
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: last_modified_by
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: currency
-                  type: VARCHAR(3)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: amount
-                  type: DECIMAL(19,6)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: iban
-                  type: VARCHAR(34)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: value_date
-                  type: DATE
-                  constraints:
-                    nullable: false
-              - column:
-                  name: description
-                  type: VARCHAR(255)
-
-  - changeSet:
-      id: Create Index on the table Transaction
-      author: Alex TO
-      changes:
-        - createIndex:
-            indexName: IDX_TX_IBAN
-            tableName: TRANSACTION
-            columns:
-              - column:
-                  name: iban
-
-  - changeSet:
       id: Create Account Table
       author: Alex TO
       changes:
@@ -126,3 +53,78 @@ databaseChangeLog:
             columns:
               - column:
                   name: user_id
+
+  - changeSet:
+      id: Create Transaction Table
+      author: Alex TO
+      changes:
+        - createTable:
+            tableName: TRANSACTION
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified_date
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified_by
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency
+                  type: VARCHAR(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(19,6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: iban
+                  type: VARCHAR(34)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_txn_acc
+                    references: account(iban)
+              - column:
+                  name: value_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: Create Index on the table Transaction
+      author: Alex TO
+      changes:
+        - createIndex:
+            indexName: IDX_TX_IBAN
+            tableName: TRANSACTION
+            columns:
+              - column:
+                  name: iban
