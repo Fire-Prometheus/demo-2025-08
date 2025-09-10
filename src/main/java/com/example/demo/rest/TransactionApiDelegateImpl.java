@@ -63,7 +63,7 @@ public class TransactionApiDelegateImpl implements TransactionApiDelegate {
     private TransactionDto completeDto(Transaction transaction, String quoteCurrency) {
         var dto = mapper.toDto(transaction);
         dto.setEquivalentCurrency(quoteCurrency);
-        var rate = rateService.getQuote(transaction.getCurrency(), quoteCurrency);
+        var rate = rateService.getRate(transaction.getCurrency(), quoteCurrency);
         dto.setEquivalentAmount(transaction.getAmount()
                                            .multiply(rate)
                                            .doubleValue());
