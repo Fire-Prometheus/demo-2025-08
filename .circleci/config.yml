@@ -1,25 +1,53 @@
 version: 2.1
 
 jobs:
-  build:
+  build-and-test:
     docker:
-      - image: cimg/base:current
+      - image: cimg/openjdk:21.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: spring-boot-deps-{{ checksum "pom.xml" }}
+      - run: mvn clean install
+      - save_cache:
+          key: spring-boot-deps-{{ checksum "pom.xml" }}
+          paths:
+            - ~/.m2
+      - store_test_results:
+          path: target/surefire-reports
+
+  build-and-push-docker:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Docker Image
+          command: |
+            docker build -t your-docker-repo/your-spring-boot-app:${CIRCLE_SHA1} .
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker push your-docker-repo/your-spring-boot-app:${CIRCLE_SHA1}
+
+  deploy-to-kubernetes:
+    docker:
+      - image: cimg/base:stable
     steps:
       - checkout
       - run:
-          name: "Maven Build"
-          command: mvn clean install
-  test:
-    docker:
-      - image: cimg/base:current
-    steps:
-      - checkout
-      - run:
-          name: "Maven Test"
-          command: mvn test
+          name: Update Kubernetes Manifest and Deploy
+          command: |
+            sed -i "s|your-docker-repo/your-spring-boot-app:latest|your-docker-repo/your-spring-boot-app:${CIRCLE_SHA1}|g" k8s/deployment.yaml
+            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f k8s/service.yaml
 
 workflows:
-  build-test-workflow:
+  build-test-deploy:
     jobs:
-      - build
-      - test
+      - build-and-test
+      - build-and-push-docker:
+          requires:
+            - build-and-test
+      - deploy-to-kubernetes:
+          requires:
+            - build-and-push-docker
