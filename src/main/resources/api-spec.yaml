@@ -70,6 +70,9 @@ components:
         uuid:
           type: string
           example: 89d3o179-abcd-465b-o9ee-e2d5f6ofEld46
+        iban:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440010
         currency:
           type: string
           example: GBP
@@ -97,6 +100,7 @@ components:
       required:
         - page
         - pageSize
+        - total
         - transactions
       properties:
         page:
@@ -105,6 +109,9 @@ components:
         pageSize:
           type: integer
           example: 10
+        total:
+          type: integer
+          example: 100
         transactions:
           type: array
           items:
