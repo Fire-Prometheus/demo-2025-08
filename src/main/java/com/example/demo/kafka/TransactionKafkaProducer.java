@@ -4,8 +4,9 @@ import com.example.demo.domain.Transaction;
 import com.example.demo.service.TransactionService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -14,24 +15,23 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class TransactionKafkaProducer {
     private final KafkaTemplate<String, Transaction> kafkaTemplate;
-    private final NewTopic transactionTopic;
+    @Value("#{@transactionTopic.name()}")
+    private String topic;
     private final TransactionService transactionService;
 
     @PostConstruct
-    public void initialize() {
+    private void initialize() {
         transactionService.findAll()
                           .forEach(this::sendTransaction);
+        kafkaTemplate.flush();
+        log.info("Sent all transactions to the topic.");
     }
 
+    @SneakyThrows
     public void sendTransaction(Transaction transaction) {
-        kafkaTemplate.send(transactionTopic.name(), transaction)
-                     .whenComplete((result, throwable) -> {
-                         var uuid = transaction.getUuid();
-                         if (throwable == null) {
-                             log.info("Sent the message {}.", uuid);
-                         } else {
-                             log.warn("Failed to send the message {}.", uuid, throwable);
-                         }
-                     });
+        var uuid = transaction.getUuid()
+                              .toString();
+        kafkaTemplate.send(topic, uuid, transaction);
+        log.debug("Sent the transaction {} out.", uuid);
     }
 }

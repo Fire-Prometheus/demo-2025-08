@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -16,8 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Sql("/data/account-test-data.sql")
+@DirtiesContext
+@Sql(value = "/data/account-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@ActiveProfiles("test")
 class UserServiceTest {
     @Autowired
     private UserService service;

@@ -1,13 +1,19 @@
 spring:
+  security:
+    user:
+      name: test
+      password: test
+  kafka:
+    streams:
+      application-id: kafka-demo
   application:
     name: demo
   datasource:
     url: jdbc:tc:postgres:latest:///test
-#    username: test
-#    password: test
     driver-class-name: org.postgresql.Driver
   liquibase:
     contexts: dev
 rate:
   filePath: classpath:rate.csv
-#  source-url:
+secrets:
+  jwt: a-string-secret-at-least-256-bits-long

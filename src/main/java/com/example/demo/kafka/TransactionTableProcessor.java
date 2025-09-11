@@ -2,6 +2,7 @@ package com.example.demo.kafka;
 
 import com.example.demo.domain.MonthlyTransactions;
 import com.example.demo.domain.Transaction;
+import com.example.demo.util.TransactionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
@@ -28,15 +29,9 @@ public class TransactionTableProcessor {
         var materialized = Materialized.<String, MonthlyTransactions, KeyValueStore<Bytes, byte[]>>as(TABLE_NAME)
                                        .withKeySerde(Serdes.String())
                                        .withValueSerde(new JsonSerde<>(MonthlyTransactions.class));
-        KTable<String, MonthlyTransactions> groupedTransactions = stream.groupBy((transactionId, transaction) -> createCompositeKey(transaction), Grouped.with(Serdes.String(), new JsonSerde<>(Transaction.class)))
+        KTable<String, MonthlyTransactions> groupedTransactions = stream.groupBy((transactionId, transaction) -> TransactionUtil.createCompositeKey(transaction), Grouped.with(Serdes.String(), new JsonSerde<>(Transaction.class)))
                                                                         .aggregate(MonthlyTransactions::new, (compositeKey, transaction, monthlyTransactions) -> this.monthlyTransactionsAggregator(transaction, monthlyTransactions), materialized);
         log.info("Built the KTable for monthly transactions.");
-    }
-
-    private String createCompositeKey(Transaction transaction) {
-        String yearMonth = transaction.getValueDate()
-                                      .format(DATE_TIME_FORMATTER);
-        return transaction.getIban() + "|" + yearMonth;
     }
 
     private MonthlyTransactions monthlyTransactionsAggregator(Transaction transaction, MonthlyTransactions monthlyTransactions) {
@@ -46,6 +41,7 @@ public class TransactionTableProcessor {
         monthlyTransactions.setMonth(monthlyTransactions.getMonth());
         monthlyTransactions.getTransactions()
                            .add(transaction);
+        log.trace("Handled the transaction {}", transaction.getUuid());
         return monthlyTransactions;
     }
 }
