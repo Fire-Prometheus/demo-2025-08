@@ -1,6 +1,6 @@
 package com.example.demo.configuration;
 
-import com.example.demo.components.UserAuditAware;
+import com.example.demo.component.UserAuditAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;

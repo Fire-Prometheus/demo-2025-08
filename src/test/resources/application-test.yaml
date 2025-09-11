@@ -1,12 +1,6 @@
 spring:
+  liquibase:
+    contexts: test
   datasource:
-#    url: jdbc:h2:mem:public;MODE=MySQL;DB_CLOSE_DELAY=-1
-    url: jdbc:tc:mysql:8.0.36:///test
-    driverClassName: com.mysql.jdbc.Driver
-#    driverClassName: org.h2.Driver
-    username: test
-    password: test
-#    database-platform: org.hibernate.dialect.H2Dialect
-    ddl-auto: create
   jpa:
     show-sql: true
