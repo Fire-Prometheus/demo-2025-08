@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: Add data into the table ACCOUNT
+      author: Alex TO
+      context: dev
+      changes:
+        - sqlFile:
+            path: account-test-data.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: Add data into the table TRANSACTION
+      author: Alex TO
+      context: dev
+      changes:
+        - sqlFile:
+            path: transaction-test-data.sql
+            relativeToChangelogFile: true
