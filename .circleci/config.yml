@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: "Maven Build"
-          command: mvn clean compile -f pom.xml
+          command: mvn clean install
   test:
     docker:
       - image: cimg/base:current
@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: "Maven Test"
-          command: mvn test -f pom.xml
+          command: mvn test
 
 workflows:
   build-test-workflow:
