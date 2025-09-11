@@ -6,15 +6,13 @@ jobs:
       - image: cimg/base:current
     steps:
       - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+      - run: mvn clean compile -f pom.xml
   test:
     docker:
       - image: cimg/base:2023.06
     steps:
       - checkout
-      - run: mvn test
+      - run: mvn test -f pom.xml
 
 workflows:
   say-hello-workflow:
