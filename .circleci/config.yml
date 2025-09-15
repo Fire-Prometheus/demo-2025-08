@@ -1,36 +1,21 @@
 version: 2.1
-
 jobs:
-  setup_workspace:
+  build-and-deploy:
     docker:
-      - image: maven:3.8.5-openjdk-21  # Use Maven with OpenJDK 11
+      - image: cimg/openjdk:21.0 # Or another suitable Java image
     steps:
-      - checkout  # Check out the source code
-      - run:
-          name: Setup Workspace
-          command: |
-            echo "Setting up workspace..."
-            mkdir -p /home/circleci/project
-      - persist_to_workspace:
-          root: /home/circleci/project
+      - checkout
+      - setup_remote_docker # Essential for building Docker images
+      - restore_cache:
+          keys:
+            - maven-dependencies-{{ checksum "pom.xml" }} # Example for Maven
+            - maven-dependencies-
+      - run: mvn clean install -DskipTests # Build Spring Boot JAR
+      - save_cache:
           paths:
-            - .
-
-  build_test:
-    docker:
-      - image: maven:3.8.5-openjdk-21  # Use Maven with OpenJDK 11
-    steps:
-      - attach_workspace:
-          at: /home/circleci/project
-      - run:
-          name: Build and Test Maven Application
-          command: |
-            mvn clean install  # Build and test the Maven application
+            - ~/.m2 # Example for Maven
+          key: maven-dependencies-{{ checksum "pom.xml" }}
 workflows:
-  version: 2
-  ci_cd_pipeline:
+  build-deploy-workflow:
     jobs:
-      - setup_workspace
-      - build_test:
-          requires:
-            - setup_workspace
+      - build-and-deploy
