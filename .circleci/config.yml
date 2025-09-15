@@ -1,21 +1,20 @@
 version: 2.1
 jobs:
-  build-and-deploy:
+  build-and-test:
     docker:
-      - image: cimg/openjdk:21.0 # Or another suitable Java image
+      - image: cimg/openjdk:21.0 # Or your desired Java image
     steps:
       - checkout
-      - setup_remote_docker # Essential for building Docker images
-      - restore_cache:
-          keys:
-            - maven-dependencies-{{ checksum "pom.xml" }} # Example for Maven
-            - maven-dependencies-
-      - run: mvn clean install # Build Spring Boot JAR
-      - save_cache:
-          paths:
-            - ~/.m2 # Example for Maven
-          key: maven-dependencies-{{ checksum "pom.xml" }}
+      - setup_remote_docker: # Required for Testcontainers with Docker executor
+          docker_layer_caching: true
+      - run:
+          name: Set Testcontainers Host Override
+          command: echo 'export TESTCONTAINERS_HOST_OVERRIDE=localhost' >> $BASH_ENV
+      - run:
+          name: Run Tests with Testcontainers
+          command: ./mvnw clean verify
 workflows:
-  build-deploy-workflow:
+  version: 2
+  build:
     jobs:
-      - build-and-deploy
+      - build-and-test
