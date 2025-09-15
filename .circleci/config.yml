@@ -1,53 +1,36 @@
 version: 2.1
 
 jobs:
-  build-and-test:
+  setup_workspace:
     docker:
-      - image: cimg/openjdk:21.0
+      - image: maven:3.8.5-openjdk-21  # Use Maven with OpenJDK 11
     steps:
-      - checkout
-      - restore_cache:
-          key: spring-boot-deps-{{ checksum "pom.xml" }}
-      - run: mvn clean install
-      - save_cache:
-          key: spring-boot-deps-{{ checksum "pom.xml" }}
+      - checkout  # Check out the source code
+      - run:
+          name: Setup Workspace
+          command: |
+            echo "Setting up workspace..."
+            mkdir -p /home/circleci/project
+      - persist_to_workspace:
+          root: /home/circleci/project
           paths:
-            - ~/.m2
-      - store_test_results:
-          path: target/surefire-reports
+            - .
 
-  build-and-push-docker:
+  build_test:
     docker:
-      - image: cimg/base:stable
+      - image: maven:3.8.5-openjdk-21  # Use Maven with OpenJDK 11
     steps:
-      - checkout
-      - setup_remote_docker
+      - attach_workspace:
+          at: /home/circleci/project
       - run:
-          name: Build and Push Docker Image
+          name: Build and Test Maven Application
           command: |
-            docker build -t your-docker-repo/your-spring-boot-app:${CIRCLE_SHA1} .
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker push your-docker-repo/your-spring-boot-app:${CIRCLE_SHA1}
-
-  deploy-to-kubernetes:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - run:
-          name: Update Kubernetes Manifest and Deploy
-          command: |
-            sed -i "s|your-docker-repo/your-spring-boot-app:latest|your-docker-repo/your-spring-boot-app:${CIRCLE_SHA1}|g" k8s/deployment.yaml
-            kubectl apply -f k8s/deployment.yaml
-            kubectl apply -f k8s/service.yaml
-
+            mvn clean install  # Build and test the Maven application
 workflows:
-  build-test-deploy:
+  version: 2
+  ci_cd_pipeline:
     jobs:
-      - build-and-test
-      - build-and-push-docker:
+      - setup_workspace
+      - build_test:
           requires:
-            - build-and-test
-      - deploy-to-kubernetes:
-          requires:
-            - build-and-push-docker
+            - setup_workspace
