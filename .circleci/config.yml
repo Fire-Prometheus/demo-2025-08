@@ -10,7 +10,7 @@ jobs:
           keys:
             - maven-dependencies-{{ checksum "pom.xml" }} # Example for Maven
             - maven-dependencies-
-      - run: mvn clean install -DskipTests # Build Spring Boot JAR
+      - run: mvn clean install # Build Spring Boot JAR
       - save_cache:
           paths:
             - ~/.m2 # Example for Maven
